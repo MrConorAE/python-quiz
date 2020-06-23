@@ -1,7 +1,13 @@
 ## IMPORT STATEMENTS ##
+# Explanations:
+# random - for randomly selecting items from the question list
+# time   - for sleep/delays
+# math   - for mathematical functions (floor)
+# os     - for filesystem stuff (reading files)
 import random
 import time
 import math
+import os
 
 ## CLASSES ##
 
@@ -176,7 +182,7 @@ Your score is now {score}/{attempted}.""")
             print(f"The correct answer was (C) {q.c}.")
         elif (q.correct == "D"):
             print(f"The correct answer was (D) {q.d}.")
-        print(f"Your score is now {score} of {attempted}.")
+        print(f"Your score is now {score} of {len(questions)}.")
     print("")  # Newline to make it easier to read.
 
 
@@ -193,8 +199,13 @@ def d(o):
         pass
 
 
+def scanForFiles():
+    # Scans the working directory for question files, and imports them.
+    # If Difficulty is enabled, it will only scan for files named "easy", "medium" or "hard".
+
+
 def importQuestions(f):
-    # Imports questions from a listed file, formats them into objects and returns them to be stored.
+    # Imports questions from files, formats them into objects and returns them to be stored.
     l = []
     try:
         if f[-3:].lower() != "qdf":
@@ -254,9 +265,6 @@ def importConfig(f):
                         diff = False
                     else:
                         d(f"unknown value for configuration option {key}: {value} in file {f}")
-                elif key == "files":
-                    for f in value.split(","):
-                        files.append(f)
                 else:
                     d(f"unknown key for configuration: {key} in file {f}")
         config = Configuration(debug, diff, files)
@@ -307,7 +315,6 @@ def agecheck():
 init()
 
 ##### MAIN LOOP #####
-
 print('''
   ___        _     _
  / _ \ _   _(_)___| |
@@ -315,14 +322,14 @@ print('''
 | |_| | |_| | |/ /|_|
  \__\_\\\__,_|_/___(_)
 ''')
-if agecheck(): # Check their age (function returns true/false if they pass/fail the check)
+if agecheck():  # Check their age (function returns true/false if they pass/fail the check)
     # Print welcome messages.
     print(f"""
 Welcome to the quiz!
 
 You've got {len(questions)} questions, from {len(config.files)} file(s) coming up!
 Are you ready?
-    """ )
+    """)
     # Get the user's name.
     name = i("str", "Before we begin, what's your name?")
     # "Ready" check
@@ -330,6 +337,7 @@ Are you ready?
 
     # This is the start of the loop used if they choose to replay the quiz.
     while True:
+        score = 0
         print("Shuffling the questions...")
         # Shuffle the question list (in place).
         random.shuffle(questions)
@@ -339,34 +347,34 @@ Are you ready?
         # Iterate over each question in the questions list, and pass it to the q (question-asker) function.
         for question in range(0, len(questions)):
             q(questions[question], question + 1)
-        
+
         print("...aaand we're done!\n")
         # Print the user's score and percentage.
         print(
-            f"Your score is {score} out of {attempted}! That's {(score/attempted)*100}%.")
+            f"Your score is {score} out of {len(questions)}! That's {math.floor((score/len(questions))*100)}%.")
         # If this isn't the user's first time playing the quiz, comment on the improvement/degradation of their skills.
         if (repeat == True):
             print(f"Your previous score was {oldscore}.")
-            if (oldscore < score): # Worse this time
-                print(f"Hrm... that's a {(oldscore/score)*100}% reduction.")
-            elif (oldscore > score): # Better this time
+            if (oldscore > score):  # Worse this time
                 print(
-                    f"Well done - that's a {(score/oldscore)*100}% improvement!")
-        
+                    f"Hrm... that's a {math.floor(((oldscore/len(questions))/(score/len(questions)))*100)}% reduction.")
+            elif (oldscore < score):  # Better this time
+                print(
+                    f"Well done - that's a {math.floor(((score/len(questions))/(oldscore/len(questions)))*100)}% improvement!")
+
         # Ask the user if they would like to play the quiz again.
         choice = i("y/n", "Do you want to play this quiz again?")
         if (choice == True):  # They want to play again
             print("OK!")
             oldscore = score
             repeat = True
-            notchosen = False
-        if (choice == False):  # They do not want to play again
+        elif (choice == False):  # They do not want to play again
             print(f"""
     ---------- POST-GAME SUMMARY: ----------
     Attempted:           {attempted}
     Games:               {attempted/len(questions)}
     Correct:             {score}
-    Accuracy:            {math.floor((score/attempted))}%
+    Accuracy:            {math.floor((score/attempted)*100)}%
 
     Questions:           {len(questions)}
     Files:               {len(config.files)}
@@ -374,6 +382,6 @@ Are you ready?
 
     Thanks for playing, {name}!
     """)
-        exit()
+            exit()
 else:
     exit()
