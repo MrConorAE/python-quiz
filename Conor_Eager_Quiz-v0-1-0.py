@@ -200,8 +200,20 @@ def d(o):
 
 
 def scanForFiles():
-    # Scans the working directory for question files, and imports them.
+    # Scans the working directory for question files.
     # If Difficulty is enabled, it will only scan for files named "easy", "medium" or "hard".
+    # Returns a list of files found.
+    l = []
+    # Get the current directory of the program (from Stack Overflow answer https://stackoverflow.com/questions/5137497/#5137509)
+    path = os.path.dirname(os.path.realpath(__file__))
+    for filename in os.listdir(path):
+        if filename.upper().endswith(".QDF"):
+            d(f"found question file - name: {filename}")
+            l.append(filename)
+        else:
+            continue
+    d(f"qdf files found: {len(l)}")
+    return l
 
 
 def importQuestions(f):
@@ -288,6 +300,7 @@ def init():
     else:
         e("error while importing configuration data!")
         exit()
+    config.files = scanForFiles()
     if (config.files == []):
         e("no question files. please add some questions!")
         exit()
@@ -361,6 +374,9 @@ Are you ready?
             elif (oldscore < score):  # Better this time
                 print(
                     f"Well done - that's a {math.floor(((score/len(questions))/(oldscore/len(questions)))*100)}% improvement!")
+            else:  # Same score
+                print(
+                    f"Maintianing the status quo... that's OK.")
 
         # Ask the user if they would like to play the quiz again.
         choice = i("y/n", "Do you want to play this quiz again?")
