@@ -166,27 +166,18 @@ def q(q, n):
 {random.choice(responses.correct)}
 Your score is now {score}/{attempted}.""")
     else:
+        print(f"{random.choice(responses.incorrect)}")
         # User chose incorrect answer.
         if (q.correct == "A"):
-            print(f"""
-{random.choice(responses.incorrect)}
-The correct answer was (A) {q.a}.
-Your score is now {score}/{attempted}.""")
+            print(f"The correct answer was (A) {q.a}.")
         elif (q.correct == "B"):
-            print(f"""
-{random.choice(responses.incorrect)}
-The correct answer was (B) {q.b}.
-Your score is now {score}/{attempted}.""")
+            print(f"The correct answer was (B) {q.b}.")
         elif (q.correct == "C"):
-            print(f"""
-{random.choice(responses.incorrect)}
-The correct answer was (C) {q.c}.
-Your score is now {score}/{attempted}.""")
+            print(f"The correct answer was (C) {q.c}.")
         elif (q.correct == "D"):
-            print(f"""
-{random.choice(responses.incorrect)}
-The correct answer was (D) {q.d}.
-Your score is now {score}/{attempted}.""")
+            print(f"The correct answer was (D) {q.d}.")
+        print(f"Your score is now {score} of {attempted}.")
+    print("")  # Newline to make it easier to read.
 
 
 def e(o):
@@ -306,7 +297,7 @@ def agecheck():
     age = i("int", "What's your age?")
     if (age < minimumAge):
         print("Sorry, you're not old enough to take these quizzes.")
-        print(f"Come back in {age-minimumAge} years.")
+        print(f"Come back in {minimumAge-age} years!")
         return False
     else:
         print(f"Cool! You're old enough for these quizzes. Let's get started!")
@@ -314,6 +305,9 @@ def agecheck():
 
 
 init()
+
+##### MAIN LOOP #####
+
 print('''
   ___        _     _
  / _ \ _   _(_)___| |
@@ -321,41 +315,56 @@ print('''
 | |_| | |_| | |/ /|_|
  \__\_\\\__,_|_/___(_)
 ''')
-if agecheck():
+if agecheck(): # Check their age (function returns true/false if they pass/fail the check)
+    # Print welcome messages.
     print(f"""
 Welcome to the quiz!
 
 You've got {len(questions)} questions, from {len(config.files)} file(s) coming up!
 Are you ready?
-    """)
+    """ )
+    # Get the user's name.
     name = i("str", "Before we begin, what's your name?")
-    input("Alright! Press [ENTER] to start.")
+    # "Ready" check
+    input(f"Alright, {name}! Press [ENTER] to start the quiz!")
+
+    # This is the start of the loop used if they choose to replay the quiz.
     while True:
         print("Shuffling the questions...")
+        # Shuffle the question list (in place).
         random.shuffle(questions)
-        print("Here we go...")
+        print("Here we go...\n")
+
+        # THE IMPORTANT BIT
+        # Iterate over each question in the questions list, and pass it to the q (question-asker) function.
         for question in range(0, len(questions)):
-            q(questions[question], question+1)
-        print("...aaand we're done!")
-        print(f"""
-        Your score is {score} out of {attempted}! That's {(score/attempted)*100}%.""")
+            q(questions[question], question + 1)
+        
+        print("...aaand we're done!\n")
+        # Print the user's score and percentage.
+        print(
+            f"Your score is {score} out of {attempted}! That's {(score/attempted)*100}%.")
+        # If this isn't the user's first time playing the quiz, comment on the improvement/degradation of their skills.
         if (repeat == True):
-            if (oldscore > score):
-                print(f"""
-                Your previous score was {oldscore}. Hrm... that's a {(oldscore/score)*100}% reduction.""")
-            elif (score > oldscore):
-                print(f"""
-                Your previous score was {oldscore}. Well done - that's a {(score/oldscore)*100}% improvement!""")
-        notchosen = True
-        while notchosen:
-            choice = i("y/n", "Do you want to play it again?")
-            if (choice == True):  # They want to play again
-                print("OK!")
-                repeat = True
-            if (choice == False):  # They do not want to play again
-                print(f"""
+            print(f"Your previous score was {oldscore}.")
+            if (oldscore < score): # Worse this time
+                print(f"Hrm... that's a {(oldscore/score)*100}% reduction.")
+            elif (oldscore > score): # Better this time
+                print(
+                    f"Well done - that's a {(score/oldscore)*100}% improvement!")
+        
+        # Ask the user if they would like to play the quiz again.
+        choice = i("y/n", "Do you want to play this quiz again?")
+        if (choice == True):  # They want to play again
+            print("OK!")
+            oldscore = score
+            repeat = True
+            notchosen = False
+        if (choice == False):  # They do not want to play again
+            print(f"""
     ---------- POST-GAME SUMMARY: ----------
-    Questions attempted: {attempted}
+    Attempted:           {attempted}
+    Games:               {attempted/len(questions)}
     Correct:             {score}
     Accuracy:            {math.floor((score/attempted))}%
 
@@ -363,7 +372,8 @@ Are you ready?
     Files:               {len(config.files)}
     ----------------------------------------
 
-    Thanks for playing {name}!
+    Thanks for playing, {name}!
     """)
+        exit()
 else:
     exit()
