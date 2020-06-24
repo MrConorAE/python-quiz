@@ -426,6 +426,7 @@ Are you ready?
 
     Thanks for playing, {name}!
     """)
+            input("Press [ENTER] to exit the program. ")
             exit()
 else:
     exit()
