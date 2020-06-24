@@ -36,10 +36,12 @@ class Configuration:
 
 
 class Responses:
-    # The responses class - this data is hard-coded, so no init function.
-    correct = ["Excellent!", "Well done!", "Correct!", "Good job!", "Nice!"]
-    incorrect = ["Whoops, that's wrong.", "Oops, that's not correct.",
-                 "Hmm, not quite.", "Nope, that's not it."]
+    # The responses class - this data is hard-coded, so the init function is only to initialise it.
+    def __init__(self, c, i):
+        self.correct = c
+        self.incorrect = i
+    correct = []
+    incorrect = []
 
 
 ## VARIABLES (global) ##
@@ -63,7 +65,8 @@ name = ""
 minimumAge = 8
 
 # The object that holds responses.
-responses = Responses()
+# It's not defined here, as it relies on the user's name.
+responses = None
 
 # If the current quiz session is a repeat.
 repeat = False
@@ -170,7 +173,7 @@ def q(q, n):
         score = score + 1
         print(f"""
 {random.choice(responses.correct)}
-Your score is now {score}/{attempted}.""")
+Your score is now {score} of {len(questions)}.""")
     else:
         print(f"{random.choice(responses.incorrect)}")
         # User chose incorrect answer.
@@ -348,6 +351,11 @@ Are you ready?
     # "Ready" check
     input(f"Alright, {name}! Press [ENTER] to start the quiz!")
 
+    # Responses list. Defined here because it needs the user's name.
+    responses = Responses(["Excellent!", "Well done!", "Correct!", "Good job!", "Nice!",
+                           f"Excellent, {name}!", f"Well done, {name}!", f"Correct, {name}!", f"Good job, {name}!", f"Nice, {name}!"],
+                          ["Whoops, that's wrong.", "Oops, that's not correct.", "Hmm, not quite.", "Nope, that's not it.", f"Whoops, {name}, that's wrong.", f"Oops {name}, that's not correct.", f"Hmm, not quite.", f"Nope, that's not it.", f"Sorry, {name}... that's wrong."])
+
     # This is the start of the loop used if they choose to replay the quiz.
     while True:
         score = 0
@@ -365,9 +373,29 @@ Are you ready?
         # Print the user's score and percentage.
         print(
             f"Your score is {score} out of {len(questions)}! That's {math.floor((score/len(questions))*100)}%.")
+
+        # Depending on the percentage the user gets, display a special message.
+        percentage = math.floor((score/len(questions))*100)
+        if (percentage == 0):
+            # 0%
+            print(f"Oh dear. Better luck next time, {name}.")
+        elif (percentage > 1 and percentage <= 50):
+            # 1% to 50%
+            print(
+                f"Great start! Keep working at it {name}, and soon you'll be getting 100% every time.")
+        elif (percentage > 50 and percentage <= 75):
+            # 51% to 75%
+            print(f"Well done, {name}! That was great.")
+        elif (percentage > 75 and percentage < 100):
+            # 76% to 99%
+            print(f"Excellent, {name}! That was spectacular.")
+        elif (percentage == 100):
+            # 100%
+            print(f"Outstanding! Perfect score, {name}!")
+
         # If this isn't the user's first time playing the quiz, comment on the improvement/degradation of their skills.
         if (repeat == True):
-            print(f"Your previous score was {oldscore}.")
+            print(f"Your previous score from last game was {oldscore}.")
             if (oldscore > score):  # Worse this time
                 print(
                     f"Hrm... that's a {math.floor(((oldscore/len(questions))/(score/len(questions)))*100)}% reduction.")
@@ -379,7 +407,7 @@ Are you ready?
                     f"Maintianing the status quo... that's OK.")
 
         # Ask the user if they would like to play the quiz again.
-        choice = i("y/n", "Do you want to play this quiz again?")
+        choice = i("y/n", f"{name}, do you want to play this quiz again?")
         if (choice == True):  # They want to play again
             print("OK!")
             oldscore = score
