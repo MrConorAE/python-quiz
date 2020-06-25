@@ -335,6 +335,12 @@ def init():
     else:
         for f in config.files:
             questions = questions + importQuestions(f)
+    if (questions == []):
+        # No questions were imported.
+        e("no questions imported.")
+        print("Oops... no questions were found or could be read. Please make sure you have files, and that they are named and formatted correctly.")
+        input("Press [ENTER] to exit the program.")
+        exit()
     print("Done!")
 
 
