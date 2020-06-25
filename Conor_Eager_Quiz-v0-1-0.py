@@ -303,14 +303,35 @@ def init():
     else:
         e("error while importing configuration data!")
         exit()
+    # Scan the directory for possible files.
     config.files = scanForFiles()
+
+    # If no question files were found, notify the user to add some more.
     if (config.files == []):
         e("no question files. please add some questions!")
         exit()
+
+    # If the user has difficulty mode enabled, ask them to choose a difficulty.
     if (config.difficulty == True):
-        easy = importQuestions(config.files[0])
-        medium = importQuestions(config.files[1])
-        hard = importQuestions(config.files[2])
+        print("You have difficulty mode enabled.")
+        print("(to disable it, see the README.)")
+        print("(A) Easy")
+        print("(B) Medium")
+        print("(C) Hard")
+        print("(D) Never mind, import all")
+        print("")
+        diff = i("mlt", "Which difficulty would you like?")
+        if (diff == "A"):
+            questions = importQuestions("easy.qdf")
+        elif (diff == "B"):
+            questions = importQuestions("medium.qdf")
+        elif (diff == "C"):
+            questions = importQuestions("hard.qdf")
+        elif (diff == "D"):
+            for f in ["easy.qdf", "medium.qdf", "hard.qdf"]:
+                questions = questions + importQuestions(f)
+
+    # Otherwise, import all the files we found.
     else:
         for f in config.files:
             questions = questions + importQuestions(f)
@@ -429,4 +450,5 @@ Are you ready?
             input("Press [ENTER] to exit the program. ")
             exit()
 else:
+    input("Press [ENTER] to exit the program. ")
     exit()
